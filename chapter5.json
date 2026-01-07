@@ -1,0 +1,705 @@
+[
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 1,
+    "type": 1,
+    "content": "この国では、長引く不況で国民の生活は__困窮__している。",
+    "answers": ["こんきゅう", "こんく", "こんきょ", "こんぐう"],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 2,
+    "type": 1,
+    "content": "彼はいつも__地味__な服を着ている。",
+    "answers": ["じみ", "ちみ", "じあじ", "ちあじ"],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 3,
+    "type": 1,
+    "content": "この会社は、社員の__待遇__がよい。",
+    "answers": ["たいぐう", "たいくう", "だいぐう", "だいくう"],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 4,
+    "type": 1,
+    "content": "この計画は、予算不足で__頓挫__した。",
+    "answers": ["とんざ", "どんざ", "とんさ", "どんさ"],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 5,
+    "type": 1,
+    "content": "彼女は、__潔く__罪を認めた。",
+    "answers": ["いさぎよく", "きよく", "みじかく", "はげしく"],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 6,
+    "type": 2,
+    "content": "彼は、__けんきょ__な態度で接した。",
+    "answers": ["謙虚", "嫌虚", "検虚", "建虚"],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 7,
+    "type": 2,
+    "content": "この問題は、__ふくざつ__で難しい。",
+    "answers": ["複雑", "復雑", "副雑", "服雑"],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 8,
+    "type": 2,
+    "content": "彼は、__しんちょう__に行動した。",
+    "answers": ["慎重", "真重", "深重", "信重"],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 9,
+    "type": 2,
+    "content": "この建物は、__たいしん__構造になっている。",
+    "answers": ["耐震", "対震", "帯震", "待震"],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 10,
+    "type": 2,
+    "content": "彼は、__こうかい__しているようだ。",
+    "answers": ["後悔", "航海", "公海", "公開"],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 11,
+    "type": 3,
+    "content": "（　）意識を高める。",
+    "answers": [
+      "美",
+      "無",
+      "不",
+      "非"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 12,
+    "type": 3,
+    "content": "（　）責任を問う。",
+    "answers": [
+      "無",
+      "不",
+      "非",
+      "未"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 13,
+    "type": 3,
+    "content": "（　）公式な発表。",
+    "answers": [
+      "非",
+      "不",
+      "無",
+      "未"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 14,
+    "type": 3,
+    "content": "（　）解決の事件。",
+    "answers": [
+      "未",
+      "無",
+      "不",
+      "非"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 15,
+    "type": 3,
+    "content": "（　）自然な笑顔。",
+    "answers": [
+      "不",
+      "無",
+      "非",
+      "未"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 16,
+    "type": 4,
+    "content": "彼は、仕事に（　）を持っている。",
+    "answers": [
+      "誇り",
+      "埃",
+      "怒り",
+      "残り"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 17,
+    "type": 4,
+    "content": "彼女は、とても（　）な性格だ。",
+    "answers": [
+      "温厚",
+      "濃厚",
+      "参考",
+      "備考"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 18,
+    "type": 4,
+    "content": "この問題は、（　）に解決した。",
+    "answers": [
+      "円満",
+      "不満",
+      "自慢",
+      "我慢"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 19,
+    "type": 4,
+    "content": "彼は、いつも（　）を言っている。",
+    "answers": [
+      "冗談",
+      "相談",
+      "会談",
+      "対談"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 20,
+    "type": 4,
+    "content": "彼女は、将来を（　）している。",
+    "answers": [
+      "悲観",
+      "楽観",
+      "客観",
+      "主観"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 21,
+    "type": 4,
+    "content": "彼は、自分の意見を（　）した。",
+    "answers": [
+      "主張",
+      "出張",
+      "手帳",
+      "緊張"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 22,
+    "type": 4,
+    "content": "この計画は、（　）に変更された。",
+    "answers": [
+      "大幅",
+      "小幅",
+      "全幅",
+      "半幅"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 23,
+    "type": 5,
+    "content": "彼は、とても器用だ。",
+    "answers": [
+      "手先が動く",
+      "頭が良い",
+      "足が速い",
+      "力が強い"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 24,
+    "type": 5,
+    "content": "彼女は、とても几帳面だ。",
+    "answers": [
+      "細かい",
+      "大雑把",
+      "暗い",
+      "明るい"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 25,
+    "type": 5,
+    "content": "彼は、とても臆病だ。",
+    "answers": [
+      "怖がり",
+      "勇敢",
+      "元気",
+      "病気"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 26,
+    "type": 5,
+    "content": "彼女は、とても頑固だ。",
+    "answers": [
+      "譲らない",
+      "素直",
+      "優しい",
+      "厳しい"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 27,
+    "type": 5,
+    "content": "彼は、とても短気だ。",
+    "answers": [
+      "怒りっぽい",
+      "気が長い",
+      "気が利く",
+      "気が合う"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 28,
+    "type": 6,
+    "content": "普及",
+    "answers": [
+      "携帯電話が普及した。",
+      "彼は普及の名作を書いた。",
+      "この病気は普及する。",
+      "彼は普及に努めた。"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 29,
+    "type": 6,
+    "content": "貢献",
+    "answers": [
+      "彼は社会に貢献した。",
+      "彼は会社に貢献した。",
+      "彼は家族に貢献した。",
+      "彼は友人に貢献した。"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 30,
+    "type": 6,
+    "content": "把握",
+    "answers": [
+      "状況を把握する。",
+      "手を把握する。",
+      "心を把握する。",
+      "夢を把握する。"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 31,
+    "type": 6,
+    "content": "促進",
+    "answers": [
+      "販売を促進する。",
+      "成長を促進する。",
+      "理解を促進する。",
+      "交流を促進する。"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 32,
+    "type": 6,
+    "content": "検索",
+    "answers": [
+      "インターネットで検索する。",
+      "辞書で検索する。",
+      "地図で検索する。",
+      "本で検索する。"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 33,
+    "type": 7,
+    "content": "彼は、勉強（　）、スポーツも得意だ。",
+    "answers": [
+      "ばかりか",
+      "ばかりに",
+      "ばかりで",
+      "ばかりの"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 34,
+    "type": 7,
+    "content": "彼女は、美人（　）、性格も良い。",
+    "answers": [
+      "うえに",
+      "うえで",
+      "うえは",
+      "うえの"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 35,
+    "type": 7,
+    "content": "彼は、病気（　）、会社を休んだ。",
+    "answers": [
+      "のために",
+      "のように",
+      "のに",
+      "ので"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 36,
+    "type": 7,
+    "content": "彼女は、忙しい（　）、手伝ってくれた。",
+    "answers": [
+      "にもかかわらず",
+      "にかかわらず",
+      "かかわらず",
+      "かかわる"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 37,
+    "type": 7,
+    "content": "彼は、成功（　）、努力した。",
+    "answers": [
+      "に向けて",
+      "にむかって",
+      "にむけて",
+      "にむかう"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 38,
+    "type": 7,
+    "content": "彼女は、先生（　）、質問した。",
+    "answers": [
+      "に対して",
+      "にたいして",
+      "にたいする",
+      "にたいし"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 39,
+    "type": 7,
+    "content": "彼は、親（　）、反抗した。",
+    "answers": [
+      "に反して",
+      "にはんして",
+      "にはんする",
+      "にはんし"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 40,
+    "type": 7,
+    "content": "彼女は、期待（　）、応えた。",
+    "answers": [
+      "に応えて",
+      "にこたえて",
+      "にこたえる",
+      "にこたえ"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 41,
+    "type": 7,
+    "content": "彼は、約束（　）、守った。",
+    "answers": [
+      "通りに",
+      "どおりに",
+      "とおりに",
+      "とうりに"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 42,
+    "type": 7,
+    "content": "彼女は、予想（　）、合格した。",
+    "answers": [
+      "通りに",
+      "どおりに",
+      "とおりに",
+      "とうりに"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 43,
+    "type": 7,
+    "content": "彼は、計画（　）、実行した。",
+    "answers": [
+      "通りに",
+      "どおりに",
+      "とおりに",
+      "とうりに"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 44,
+    "type": 7,
+    "content": "彼女は、指示（　）、動いた。",
+    "answers": [
+      "通りに",
+      "どおりに",
+      "とおりに",
+      "とうりに"
+    ],
+    "correctAnswer": 1,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 45,
+    "type": 8,
+    "content": "彼は、____ ____ ★ ____ 勉強している。",
+    "answers": [
+      "毎日",
+      "夜遅く",
+      "まで",
+      "熱心に"
+    ],
+    "correctAnswer": 3,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 46,
+    "type": 8,
+    "content": "彼女は、____ ____ ★ ____ 料理を作った。",
+    "answers": [
+      "家族の",
+      "ために",
+      "おいしい",
+      "夕食の"
+    ],
+    "correctAnswer": 2,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 47,
+    "type": 8,
+    "content": "彼は、____ ____ ★ ____ 手紙を書いた。",
+    "answers": [
+      "友人に",
+      "感謝の",
+      "気持ちを",
+      "込めて"
+    ],
+    "correctAnswer": 4,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 48,
+    "type": 8,
+    "content": "彼女は、____ ____ ★ ____ 歌を歌った。",
+    "answers": [
+      "みんなの",
+      "前で",
+      "得意な",
+      "日本の"
+    ],
+    "correctAnswer": 2,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "id": 49,
+    "type": 8,
+    "content": "彼は、____ ____ ★ ____ 夢を語った。",
+    "answers": [
+      "将来の",
+      "ことについて",
+      "熱く",
+      "友人と"
+    ],
+    "correctAnswer": 2,
+    "explanation": ""
+  },
+  {
+    "chapter": "第5回 模擬テスト",
+    "passageTitle": "",
+    "passageContent": "最近、健康のために運動を始める人が増えています。しかし、急に激しい運動をすると、かえって体を壊してしまうことがあります。まずは、自分の体力に合った運動から始めることが大切です。\n\nウォーキングは、誰でも手軽に始められる運動の一つです。特別な道具も必要なく、自分のペースで歩くことができます。また、景色を楽しみながら歩くことで、ストレス解消にもなります。\n\n運動を続けるためには、無理をしないことが一番です。毎日続けようとすると、プレッシャーになってしまうことがあります。週に数回、気分転換のつもりで楽しむのが長続きの秘訣です。\n\nまた、仲間と一緒に運動するのも良い方法です。励まし合いながら行うことで、モチベーションを維持することができます。最近では、地域のスポーツクラブやサークルに参加する人も増えています。\n\n健康な体を作るためには、運動だけでなく、食事や睡眠も大切です。バランスの取れた食事を心がけ、十分な睡眠をとるようにしましょう。( 50 )、健康的な生活習慣を身につけることが、病気の予防にもつながります。\n\n( 51 )、運動を始める前に、医師に相談することをお勧めします。特に、持病がある人や高齢者は、専門家のアドバイスを受けることで、安全に運動を行うことができます。\n\nさあ、あなたも今日から、無理のない範囲で運動を始めてみませんか。",
+    "questions": [
+      {
+        "id": 50,
+        "type": 9,
+        "content": "（50）に入る最もよいもの",
+        "answers": [
+          "そして",
+          "しかし",
+          "つまり",
+          "なぜなら"
+        ],
+        "correctAnswer": 1
+      },
+      {
+        "id": 51,
+        "type": 9,
+        "content": "（51）に入る最もよいもの",
+        "answers": [
+          "なお",
+          "また",
+          "ところで",
+          "さて"
+        ],
+        "correctAnswer": 1
+      },
+      {
+        "id": 52,
+        "type": 9,
+        "content": "この文章で筆者が最も言いたいことは何か",
+        "answers": [
+          "激しい運動は避けるべきだ",
+          "ウォーキングは最高の運動だ",
+          "無理なく楽しく運動を続けることが大切だ",
+          "医師に相談してから運動すべきだ"
+        ],
+        "correctAnswer": 3
+      },
+      {
+        "id": 53,
+        "type": 9,
+        "content": "運動を長続きさせるための秘訣として挙げられていないものはどれか",
+        "answers": [
+          "無理をしないこと",
+          "毎日続けること",
+          "気分転換のつもりで行うこと",
+          "仲間と一緒に行うこと"
+        ],
+        "correctAnswer": 2
+      },
+      {
+        "id": 54,
+        "type": 9,
+        "content": "健康な体を作るために大切だと述べられていることは何か",
+        "answers": [
+          "運動のみ",
+          "食事のみ",
+          "睡眠のみ",
+          "運動、食事、睡眠"
+        ],
+        "correctAnswer": 4
+      }
+    ]
+  }
+]
