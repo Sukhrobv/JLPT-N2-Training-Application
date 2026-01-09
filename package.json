@@ -4,10 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "npm run refresh && vite",
     "dev:server": "nodemon server/server.js",
     "dev:all": "concurrently \"npm run dev\" \"npm run dev:server\"",
     "seed": "node server/seed.js",
+    "refresh": "node server/seed_from_json.js",
     "start": "node server/server.js",
     "build": "vite build",
     "lint": "eslint .",

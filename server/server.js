@@ -383,8 +383,9 @@ app.get('/api/sessions/:id/results', (req, res) => {
       LEFT JOIN answers a ON sq.user_answer_id = a.id
       LEFT JOIN answers ca ON ca.question_id = q.id AND ca.is_correct = 1
       LEFT JOIN question_types qt ON q.type_id = qt.id
+      WHERE sq.session_id = ?
       ORDER BY sq.display_order
-    `).all();
+    `).all(id);
     
     const correctCount = results.filter(r => r.is_correct === 1).length;
     const answeredCount = results.filter(r => r.user_answer_id !== null).length;

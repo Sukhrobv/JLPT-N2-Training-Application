@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import * as api from './services/api';
 import QuizSetup from './components/QuizSetup';
 import QuizQuestion from './components/QuizQuestion';
 import Results from './components/Results';
@@ -9,10 +10,12 @@ function App() {
   const [screen, setScreen] = useState('setup'); // 'setup', 'quiz', 'results', 'admin'
   const [sessionId, setSessionId] = useState(null);
   const [totalQuestions, setTotalQuestions] = useState(0);
+  const [lastSessionConfig, setLastSessionConfig] = useState(null);
 
-  const handleStart = (id, total) => {
+  const handleStart = (id, total, config) => {
     setSessionId(id);
     setTotalQuestions(total);
+    setLastSessionConfig(config || null);
     setScreen('quiz');
   };
 
@@ -20,10 +23,25 @@ function App() {
     setScreen('results');
   };
 
-  const handleRestart = () => {
-    setScreen('setup');
-    setSessionId(null);
-    setTotalQuestions(0);
+  const handleRestart = async () => {
+    if (!lastSessionConfig) {
+      setScreen('setup');
+      setSessionId(null);
+      setTotalQuestions(0);
+      return;
+    }
+
+    try {
+      const session = await api.createSession(lastSessionConfig);
+      setSessionId(session.sessionId);
+      setTotalQuestions(session.totalQuestions);
+      setScreen('quiz');
+    } catch (err) {
+      console.error('Failed to restart session:', err);
+      setScreen('setup');
+      setSessionId(null);
+      setTotalQuestions(0);
+    }
   };
 
   const handleGoToAdmin = () => {

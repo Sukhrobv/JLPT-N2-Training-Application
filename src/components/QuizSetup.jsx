@@ -48,12 +48,13 @@ export default function QuizSetup({ onStart }) {
   const handleStart = async () => {
     try {
       setLoading(true);
-      const session = await api.createSession({
+      const sessionConfig = {
         typeId: selectedType,
         chapterIds: selectedChapters.length > 0 ? selectedChapters : null,
         limit: questionLimit > 0 ? questionLimit : null
-      });
-      onStart(session.sessionId, session.totalQuestions);
+      };
+      const session = await api.createSession(sessionConfig);
+      onStart(session.sessionId, session.totalQuestions, sessionConfig);
     } catch (err) {
       setError(err.message);
       setLoading(false);

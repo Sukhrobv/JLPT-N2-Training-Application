@@ -131,6 +131,8 @@
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: left;
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 .answer-option:hover:not(:disabled) {
@@ -191,6 +193,8 @@
   line-height: 1.5;
   padding-top: 0.35rem;
   color: var(--text-primary);
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 /* Answer Feedback */
@@ -305,4 +309,21 @@
 .next-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 30px rgba(16, 185, 129, 0.4);
+}
+
+/* Ordering Slot (Mondai 8) */
+.ordering-slot {
+  display: inline-block;
+  width: 60px;
+  border-bottom: 2px solid var(--text-primary);
+  margin: 0 0.5rem;
+  vertical-align: bottom;
+}
+
+.ordering-star {
+  display: inline-block;
+  margin: 0 0.5rem;
+  font-weight: bold;
+  font-size: 1.2em;
+  color: var(--text-primary);
 }

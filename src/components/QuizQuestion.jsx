@@ -9,6 +9,9 @@ export default function QuizQuestion({ sessionId, totalQuestions, onComplete }) 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const STAR_SYMBOL = '\u2605';
+  const ORDERING_SLOT_TOKEN = '[[SLOT]]';
+  const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
   // Русские названия для типов
   const typeNamesRu = {
@@ -62,6 +65,36 @@ export default function QuizQuestion({ sessionId, totalQuestions, onComplete }) 
     } else {
       onComplete();
     }
+  };
+
+  const renderQuestionContent = (content) => {
+    const protectedContent = content.replace(/____/g, ORDERING_SLOT_TOKEN);
+    const orderingTokenPattern = new RegExp(
+      `(${escapeRegExp(ORDERING_SLOT_TOKEN)}|${escapeRegExp(STAR_SYMBOL)})`,
+      'g'
+    );
+
+    return protectedContent.split(/__(.+?)__/g).map((part, index) => {
+      if (index % 2 === 1) {
+        return <u key={`u-${index}`}>{part}</u>;
+      }
+
+      return part
+        .split(orderingTokenPattern)
+        .map((subPart, subIndex) => {
+          if (subPart === ORDERING_SLOT_TOKEN) {
+            return <span key={`slot-${index}-${subIndex}`} className="ordering-slot"></span>;
+          }
+          if (subPart === STAR_SYMBOL) {
+            return (
+              <span key={`star-${index}-${subIndex}`} className="ordering-star">
+                {STAR_SYMBOL}
+              </span>
+            );
+          }
+          return subPart;
+        });
+    });
   };
 
   if (loading) {
@@ -122,9 +155,7 @@ export default function QuizQuestion({ sessionId, totalQuestions, onComplete }) 
       {/* Question */}
       <div className="question-content">
         <p>
-          {questionData.question.content.split(/__(.*?)__/g).map((part, index) => 
-            index % 2 === 1 ? <u key={index}>{part}</u> : part
-          )}
+          {renderQuestionContent(questionData.question.content)}
         </p>
       </div>
 
