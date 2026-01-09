@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import * as api from './services/api';
 import QuizSetup from './components/QuizSetup';
 import QuizQuestion from './components/QuizQuestion';
@@ -11,6 +11,24 @@ function App() {
   const [sessionId, setSessionId] = useState(null);
   const [totalQuestions, setTotalQuestions] = useState(0);
   const [lastSessionConfig, setLastSessionConfig] = useState(null);
+  const getInitialTheme = () => {
+    if (typeof window === 'undefined') return 'light';
+    const storedTheme = window.localStorage.getItem('theme');
+    if (storedTheme === 'dark' || storedTheme === 'light') return storedTheme;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light';
+  };
+  const [theme, setTheme] = useState(getInitialTheme);
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', theme);
+    }
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('theme', theme);
+    }
+  }, [theme]);
 
   const handleStart = (id, total, config) => {
     setSessionId(id);
@@ -44,6 +62,10 @@ function App() {
     }
   };
 
+  const handleToggleTheme = (event) => {
+    setTheme(event.target.checked ? 'dark' : 'light');
+  };
+
   const handleGoToAdmin = () => {
     setScreen('admin');
   };
@@ -57,6 +79,18 @@ function App() {
       <div className="app-container">
         {screen === 'setup' && (
           <>
+            <div className="app-toolbar">
+              <label className="theme-toggle">
+                <span className="theme-label">Dark mode</span>
+                <input
+                  type="checkbox"
+                  checked={theme === 'dark'}
+                  onChange={handleToggleTheme}
+                  aria-label="Toggle dark mode"
+                />
+                <span className="theme-slider"></span>
+              </label>
+            </div>
             <QuizSetup onStart={handleStart} />
             <div className="admin-link">
               <button onClick={handleGoToAdmin}>
