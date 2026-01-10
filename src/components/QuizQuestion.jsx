@@ -11,6 +11,7 @@ export default function QuizQuestion({ sessionId, totalQuestions, onComplete }) 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const STAR_SYMBOL = '\u2605';
   const ORDERING_SLOT_TOKEN = '[[SLOT]]';
   const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -26,6 +27,16 @@ export default function QuizQuestion({ sessionId, totalQuestions, onComplete }) 
 
   useEffect(() => {
     initializeSession();
+  }, [sessionId]);
+
+  useEffect(() => {
+    setElapsedSeconds(0);
+    const startedAt = Date.now();
+    const intervalId = window.setInterval(() => {
+      const deltaSeconds = Math.floor((Date.now() - startedAt) / 1000);
+      setElapsedSeconds(deltaSeconds);
+    }, 1000);
+    return () => window.clearInterval(intervalId);
   }, [sessionId]);
 
   useEffect(() => {
@@ -232,6 +243,11 @@ export default function QuizQuestion({ sessionId, totalQuestions, onComplete }) 
     ? (typeNamesRu[questionData.question.type] || questionData.question.typeJa)
     : '';
   const allAnswered = !!summary && summary.answeredQuestions >= summary.totalQuestions;
+  const formatElapsed = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+  };
 
   return (
     <div className="quiz-question">
@@ -285,9 +301,14 @@ export default function QuizQuestion({ sessionId, totalQuestions, onComplete }) 
         </div>
       )}
 
-      {/* Question Type Badge */}
-      <div className="question-type-badge">
-        {typeName}
+      {/* Question Type Badge + Timer */}
+      <div className="question-topbar">
+        <div className="question-type-badge">
+          {typeName}
+        </div>
+        <div className="quiz-timer" aria-live="polite">
+          {formatElapsed(elapsedSeconds)}
+        </div>
       </div>
 
       {/* Reading Passage */}
@@ -397,12 +418,3 @@ export default function QuizQuestion({ sessionId, totalQuestions, onComplete }) 
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
