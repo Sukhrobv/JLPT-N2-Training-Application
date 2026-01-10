@@ -31,6 +31,27 @@ export default function Results({ sessionId, onRestart }) {
     }
   };
 
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.code !== 'Space' && event.key !== ' ') return;
+      if (event.repeat) return;
+      const target = event.target;
+      if (target?.isContentEditable) return;
+      const tagName = target?.tagName?.toUpperCase();
+      if (['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON', 'A'].includes(tagName)) return;
+      if (loading) return;
+      event.preventDefault();
+      if (error) {
+        loadResults();
+        return;
+      }
+      onRestart();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [loading, error, onRestart, loadResults]);
+
   if (loading) {
     return (
       <div className="results loading">

@@ -193,6 +193,7 @@ app.post('/api/sessions', (req, res) => {
 app.get('/api/sessions/:id', (req, res) => {
   try {
     const { id } = req.params;
+    const indexParam = req.query.index;
     
     // Get session info
     const session = db.prepare('SELECT * FROM training_sessions WHERE id = ?').get(id);
@@ -200,18 +201,22 @@ app.get('/api/sessions/:id', (req, res) => {
     if (!session) {
       return res.status(404).json({ error: 'Session not found' });
     }
-    
-    if (session.completed) {
-      return res.json({
-        completed: true,
-        sessionId: id,
-        totalQuestions: session.total_questions
-      });
+
+    const parsedIndex = Number.parseInt(indexParam, 10);
+    let currentIndex = Number.isNaN(parsedIndex) ? session.current_index : parsedIndex;
+    if (currentIndex < 0) currentIndex = 0;
+    if (currentIndex >= session.total_questions) {
+      currentIndex = Math.max(session.total_questions - 1, 0);
+    }
+
+    if (currentIndex !== session.current_index) {
+      db.prepare('UPDATE training_sessions SET current_index = ? WHERE id = ?')
+        .run(currentIndex, id);
     }
     
     // Get current session question
     const sessionQuestion = db.prepare(`
-      SELECT sq.*, q.content as question_content, q.passage_id, q.type_id,
+      SELECT sq.*, q.content as question_content, q.explanation as explanation, q.passage_id, q.type_id,
              rp.content as passage_content, rp.title as passage_title,
              qt.name as type_name, qt.name_ja as type_name_ja
       FROM session_questions sq
@@ -219,7 +224,7 @@ app.get('/api/sessions/:id', (req, res) => {
       LEFT JOIN reading_passages rp ON q.passage_id = rp.id
       LEFT JOIN question_types qt ON q.type_id = qt.id
       WHERE sq.session_id = ? AND sq.display_order = ?
-    `).get(id, session.current_index);
+    `).get(id, currentIndex);
     
     if (!sessionQuestion) {
       return res.status(404).json({ error: 'Question not found' });
@@ -248,7 +253,7 @@ app.get('/api/sessions/:id', (req, res) => {
         ORDER BY sq.display_order
       `).all(id, sessionQuestion.passage_id);
       
-      const currentPosition = passageQuestions.findIndex(pq => pq.display_order === session.current_index) + 1;
+      const currentPosition = passageQuestions.findIndex(pq => pq.display_order === currentIndex) + 1;
       
       passageInfo = {
         content: sessionQuestion.passage_content,
@@ -257,19 +262,32 @@ app.get('/api/sessions/:id', (req, res) => {
         totalInPassage: passageQuestions.length
       };
     }
+
+    let answerState = null;
+    if (sessionQuestion.user_answer_id !== null) {
+      const correctAnswer = db.prepare('SELECT id FROM answers WHERE question_id = ? AND is_correct = 1')
+        .get(sessionQuestion.question_id);
+      answerState = {
+        userAnswerId: sessionQuestion.user_answer_id,
+        isCorrect: sessionQuestion.is_correct === 1,
+        correctAnswerId: correctAnswer ? correctAnswer.id : null,
+        explanation: sessionQuestion.explanation
+      };
+    }
     
     res.json({
       sessionId: id,
-      currentIndex: session.current_index,
+      currentIndex,
       totalQuestions: session.total_questions,
-      completed: false,
+      completed: session.completed === 1,
       question: {
         content: sessionQuestion.question_content,
         type: sessionQuestion.type_name,
         typeJa: sessionQuestion.type_name_ja,
         answers
       },
-      passage: passageInfo
+      passage: passageInfo,
+      answer: answerState
     });
     
   } catch (error) {
@@ -282,7 +300,7 @@ app.get('/api/sessions/:id', (req, res) => {
 app.post('/api/sessions/:id/answer', (req, res) => {
   try {
     const { id } = req.params;
-    const { answerId } = req.body;
+    const { answerId, questionIndex } = req.body;
     
     if (!answerId) {
       return res.status(400).json({ error: 'Answer ID is required' });
@@ -295,17 +313,19 @@ app.post('/api/sessions/:id/answer', (req, res) => {
       return res.status(404).json({ error: 'Session not found' });
     }
     
-    if (session.completed) {
-      return res.status(400).json({ error: 'Session already completed' });
+    const parsedIndex = Number.parseInt(questionIndex, 10);
+    let targetIndex = Number.isNaN(parsedIndex) ? session.current_index : parsedIndex;
+    if (targetIndex < 0 || targetIndex >= session.total_questions) {
+      return res.status(400).json({ error: 'Question index is out of range' });
     }
     
-    // Get current session question
+    // Get target session question
     const sessionQuestion = db.prepare(`
       SELECT sq.*, q.explanation
       FROM session_questions sq
       JOIN questions q ON sq.question_id = q.id
       WHERE sq.session_id = ? AND sq.display_order = ?
-    `).get(id, session.current_index);
+    `).get(id, targetIndex);
     
     if (!sessionQuestion) {
       return res.status(404).json({ error: 'Question not found' });
@@ -333,31 +353,86 @@ app.post('/api/sessions/:id/answer', (req, res) => {
       SET user_answer_id = ?, is_correct = ?, answered_at = datetime('now')
       WHERE id = ?
     `).run(answerId, isCorrect ? 1 : 0, sessionQuestion.id);
-    
-    // Move to next question or complete session
-    const nextIndex = session.current_index + 1;
-    const isLastQuestion = nextIndex >= session.total_questions;
-    
-    if (isLastQuestion) {
-      db.prepare('UPDATE training_sessions SET completed = 1, current_index = ? WHERE id = ?')
-        .run(nextIndex, id);
-    } else {
-      db.prepare('UPDATE training_sessions SET current_index = ? WHERE id = ?')
-        .run(nextIndex, id);
-    }
+
+    const answeredCount = db.prepare(`
+      SELECT COUNT(*) as count
+      FROM session_questions
+      WHERE session_id = ? AND user_answer_id IS NOT NULL
+    `).get(id).count;
+
+    const isCompleted = answeredCount >= session.total_questions;
+    db.prepare('UPDATE training_sessions SET completed = ?, current_index = ? WHERE id = ?')
+      .run(isCompleted ? 1 : 0, targetIndex, id);
+
+    const nextUnanswered = db.prepare(`
+      SELECT display_order
+      FROM session_questions
+      WHERE session_id = ? AND user_answer_id IS NULL
+      ORDER BY display_order
+      LIMIT 1
+    `).get(id);
+    const nextIndex = nextUnanswered ? nextUnanswered.display_order : null;
     
     res.json({
       isCorrect,
       correctAnswerId: correctAnswer.id,
       correctAnswerContent: correctAnswer.content,
       explanation: sessionQuestion.explanation,
-      hasNext: !isLastQuestion,
-      nextIndex: isLastQuestion ? null : nextIndex
+      hasNext: nextIndex !== null,
+      nextIndex,
+      answeredCount,
+      totalQuestions: session.total_questions,
+      completed: isCompleted
     });
     
   } catch (error) {
     console.error('Error submitting answer:', error);
     res.status(500).json({ error: 'Failed to submit answer' });
+  }
+});
+
+// GET /api/sessions/:id/summary - Get session progress overview
+app.get('/api/sessions/:id/summary', (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const session = db.prepare('SELECT * FROM training_sessions WHERE id = ?').get(id);
+
+    if (!session) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+
+    const questions = db.prepare(`
+      SELECT display_order, user_answer_id, is_correct
+      FROM session_questions
+      WHERE session_id = ?
+      ORDER BY display_order
+    `).all(id);
+
+    const answeredCount = questions.filter(q => q.user_answer_id !== null).length;
+    let currentIndex = session.current_index;
+    if (currentIndex >= session.total_questions) {
+      currentIndex = Math.max(session.total_questions - 1, 0);
+    }
+
+    const firstUnanswered = questions.find(q => q.user_answer_id === null);
+
+    res.json({
+      sessionId: id,
+      totalQuestions: session.total_questions,
+      answeredQuestions: answeredCount,
+      completed: session.completed === 1,
+      currentIndex,
+      firstUnansweredIndex: firstUnanswered ? firstUnanswered.display_order : null,
+      questions: questions.map(q => ({
+        index: q.display_order,
+        answered: q.user_answer_id !== null,
+        isCorrect: q.is_correct === 1
+      }))
+    });
+  } catch (error) {
+    console.error('Error fetching session summary:', error);
+    res.status(500).json({ error: 'Failed to fetch session summary' });
   }
 });
 

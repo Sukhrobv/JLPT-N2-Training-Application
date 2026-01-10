@@ -24,17 +24,21 @@ export async function createSession({ typeId, chapterIds, limit }) {
   return response.json();
 }
 
-export async function getSessionQuestion(sessionId) {
-  const response = await fetch(`${API_BASE}/sessions/${sessionId}`);
+export async function getSessionQuestion(sessionId, index = null) {
+  const url = new URL(`${API_BASE}/sessions/${sessionId}`);
+  if (Number.isInteger(index)) {
+    url.searchParams.set('index', index);
+  }
+  const response = await fetch(url);
   if (!response.ok) throw new Error('Failed to fetch question');
   return response.json();
 }
 
-export async function submitAnswer(sessionId, answerId) {
+export async function submitAnswer(sessionId, answerId, questionIndex = null) {
   const response = await fetch(`${API_BASE}/sessions/${sessionId}/answer`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ answerId })
+    body: JSON.stringify({ answerId, questionIndex })
   });
   if (!response.ok) throw new Error('Failed to submit answer');
   return response.json();
@@ -43,6 +47,12 @@ export async function submitAnswer(sessionId, answerId) {
 export async function getSessionResults(sessionId) {
   const response = await fetch(`${API_BASE}/sessions/${sessionId}/results`);
   if (!response.ok) throw new Error('Failed to fetch results');
+  return response.json();
+}
+
+export async function getSessionSummary(sessionId) {
+  const response = await fetch(`${API_BASE}/sessions/${sessionId}/summary`);
+  if (!response.ok) throw new Error('Failed to fetch session summary');
   return response.json();
 }
 

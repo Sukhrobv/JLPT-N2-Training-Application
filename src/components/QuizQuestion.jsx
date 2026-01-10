@@ -1,44 +1,135 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import * as api from '../services/api';
 import './QuizQuestion.css';
 
 export default function QuizQuestion({ sessionId, totalQuestions, onComplete }) {
   const [questionData, setQuestionData] = useState(null);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
-  const [answerResult, setAnswerResult] = useState(null);
+  const [questionIndex, setQuestionIndex] = useState(0);
+  const [summary, setSummary] = useState(null);
+  const [showQuestionMap, setShowQuestionMap] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const STAR_SYMBOL = '\u2605';
   const ORDERING_SLOT_TOKEN = '[[SLOT]]';
   const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-  // Русские названия для типов
+  // Русские названия для типов вопросов
   const typeNamesRu = {
     'vocabulary': 'Лексика',
     'grammar': 'Грамматика',
     'reading': 'Чтение',
     'listening': 'Аудирование'
   };
+  const answerState = questionData?.answer || null;
+  const isAnswered = !!answerState?.userAnswerId;
 
   useEffect(() => {
-    loadQuestion();
+    initializeSession();
   }, [sessionId]);
 
-  const loadQuestion = async () => {
-    try {
-      setLoading(true);
-      setSelectedAnswer(null);
-      setAnswerResult(null);
-      const data = await api.getSessionQuestion(sessionId);
-      
-      if (data.completed) {
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const isSpace = event.code === 'Space' || event.key === ' ';
+      const isArrowDown = event.key === 'ArrowDown';
+      const isArrowUp = event.key === 'ArrowUp';
+      if (!isSpace && !isArrowDown && !isArrowUp) return;
+      if (isSpace && event.repeat) return;
+      const target = event.target;
+      if (target?.isContentEditable) return;
+      const tagName = target?.tagName?.toUpperCase();
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tagName)) return;
+      if (target?.closest('.question-map')) return;
+      if (target?.closest('.question-map-toggle')) return;
+      if (target?.closest('.nav-button')) return;
+      if (error && isSpace) {
+        event.preventDefault();
+        initializeSession();
+        return;
+      }
+      if (loading || submitting || !questionData) return;
+
+      if (isSpace) {
+        const answerButton = target?.closest('[data-answer-id]');
+        if (answerButton && !isAnswered) {
+          const answerId = answerButton.getAttribute('data-answer-id');
+          if (!selectedAnswer || String(selectedAnswer) !== String(answerId)) {
+            return;
+          }
+        }
+      }
+
+      if (isArrowDown || isArrowUp) {
+        if (isAnswered) return;
+        const answers = questionData.question?.answers || [];
+        if (!answers.length) return;
+        const currentIndex = answers.findIndex((answer) => answer.id === selectedAnswer);
+        let nextIndex = currentIndex;
+        if (currentIndex === -1) {
+          nextIndex = isArrowDown ? 0 : answers.length - 1;
+        } else {
+          nextIndex = isArrowDown
+            ? Math.min(currentIndex + 1, answers.length - 1)
+            : Math.max(currentIndex - 1, 0);
+        }
+        if (nextIndex !== currentIndex) {
+          event.preventDefault();
+          setSelectedAnswer(answers[nextIndex].id);
+        }
+        return;
+      }
+
+      if (!isAnswered && !selectedAnswer) return;
+
+      event.preventDefault();
+
+      if (!isAnswered) {
+        handleSubmit();
+        return;
+      }
+
+      const answeredAll = !!summary && summary.answeredQuestions >= summary.totalQuestions;
+      if (answeredAll) {
         onComplete();
         return;
       }
-      
+      handleNext();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [loading, submitting, questionData, isAnswered, selectedAnswer, summary, error, onComplete, questionIndex, totalQuestions]);
+
+  const loadSummary = async () => {
+    const data = await api.getSessionSummary(sessionId);
+    setSummary(data);
+    return data;
+  };
+
+  const loadQuestion = async (index) => {
+    try {
+      setLoading(true);
+      setError(null);
+      setSelectedAnswer(null);
+      const data = await api.getSessionQuestion(sessionId, index);
       setQuestionData(data);
+      setQuestionIndex(index);
+      setSelectedAnswer(data.answer?.userAnswerId ?? null);
       setLoading(false);
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
+    }
+  };
+
+  const initializeSession = async () => {
+    try {
+      setError(null);
+      const summaryData = await loadSummary();
+      const safeTotal = summaryData.totalQuestions || totalQuestions;
+      const fallbackIndex = Math.min(summaryData.currentIndex || 0, Math.max(safeTotal - 1, 0));
+      const initialIndex = summaryData.firstUnansweredIndex ?? fallbackIndex;
+      await loadQuestion(initialIndex);
     } catch (err) {
       setError(err.message);
       setLoading(false);
@@ -46,26 +137,37 @@ export default function QuizQuestion({ sessionId, totalQuestions, onComplete }) 
   };
 
   const handleSubmit = async () => {
-    if (!selectedAnswer || answerResult) return;
+    if (!selectedAnswer || questionData?.answer) return;
     
     try {
       setSubmitting(true);
-      const result = await api.submitAnswer(sessionId, selectedAnswer);
-      setAnswerResult(result);
+      const result = await api.submitAnswer(sessionId, selectedAnswer, questionIndex);
+      setQuestionData((prev) => ({
+        ...prev,
+        answer: {
+          userAnswerId: selectedAnswer,
+          isCorrect: result.isCorrect,
+          correctAnswerId: result.correctAnswerId,
+          explanation: result.explanation
+        }
+      }));
       setSubmitting(false);
+      await loadSummary();
     } catch (err) {
       setError(err.message);
       setSubmitting(false);
     }
   };
 
-  const handleNext = () => {
-    if (answerResult?.hasNext) {
-      loadQuestion();
-    } else {
-      onComplete();
-    }
+  const handleNavigate = (index) => {
+    if (loading || submitting) return;
+    if (index < 0 || index >= (summary?.totalQuestions ?? totalQuestions)) return;
+    if (index === questionIndex) return;
+    loadQuestion(index);
   };
+
+  const handlePrev = () => handleNavigate(questionIndex - 1);
+  const handleNext = () => handleNavigate(questionIndex + 1);
 
   const renderQuestionContent = (content) => {
     const protectedContent = content.replace(/____/g, ORDERING_SLOT_TOKEN);
@@ -97,7 +199,7 @@ export default function QuizQuestion({ sessionId, totalQuestions, onComplete }) 
     });
   };
 
-  if (loading) {
+  if (loading && !summary && !questionData) {
     return (
       <div className="quiz-question loading">
         <div className="spinner"></div>
@@ -110,13 +212,26 @@ export default function QuizQuestion({ sessionId, totalQuestions, onComplete }) 
     return (
       <div className="quiz-question error">
         <p>Ошибка: {error}</p>
-        <button onClick={loadQuestion}>Повторить</button>
+        <button onClick={initializeSession}>Повторить</button>
       </div>
     );
   }
 
-  const progress = ((questionData.currentIndex + 1) / totalQuestions) * 100;
-  const typeName = typeNamesRu[questionData.question.type] || questionData.question.typeJa;
+  if (!questionData) {
+    return (
+      <div className="quiz-question loading">
+        <div className="spinner"></div>
+        <p>Загрузка...</p>
+      </div>
+    );
+  }
+
+  const totalCount = summary?.totalQuestions ?? totalQuestions;
+  const progress = totalCount > 0 ? ((questionIndex + 1) / totalCount) * 100 : 0;
+  const typeName = questionData
+    ? (typeNamesRu[questionData.question.type] || questionData.question.typeJa)
+    : '';
+  const allAnswered = !!summary && summary.answeredQuestions >= summary.totalQuestions;
 
   return (
     <div className="quiz-question">
@@ -126,11 +241,49 @@ export default function QuizQuestion({ sessionId, totalQuestions, onComplete }) 
           <div className="progress-fill" style={{ width: `${progress}%` }}></div>
         </div>
         <div className="progress-text">
-          <span className="current">{questionData.currentIndex + 1}</span>
+          <span className="current">{questionIndex + 1}</span>
           <span className="separator">/</span>
-          <span className="total">{totalQuestions}</span>
+          <span className="total">{totalCount}</span>
         </div>
       </div>
+
+      {summary && (
+        <div className="question-map">
+          <div className="question-map-header">
+            <div className="question-map-title">
+              <span>Вопросы</span>
+              <span>{summary.answeredQuestions}/{summary.totalQuestions} ответов</span>
+            </div>
+            <button
+              type="button"
+              className="question-map-toggle"
+              onClick={() => setShowQuestionMap((prev) => !prev)}
+            >
+              {showQuestionMap ? 'Скрыть' : 'Показать'}
+            </button>
+          </div>
+          {showQuestionMap && (
+            <div className="question-map-grid">
+              {summary.questions.map((item) => {
+                const statusClass = item.answered
+                  ? (item.isCorrect ? 'correct' : 'incorrect')
+                  : 'unanswered';
+                return (
+                  <button
+                    key={item.index}
+                    className={`question-map-button ${statusClass} ${item.index === questionIndex ? 'current' : ''}`}
+                    onClick={() => handleNavigate(item.index)}
+                    disabled={loading}
+                    aria-label={`Вопрос ${item.index + 1}`}
+                  >
+                    {item.index + 1}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Question Type Badge */}
       <div className="question-type-badge">
@@ -164,10 +317,10 @@ export default function QuizQuestion({ sessionId, totalQuestions, onComplete }) 
         {questionData.question.answers.map((answer) => {
           let answerClass = 'answer-option';
           
-          if (answerResult) {
-            if (answer.id === answerResult.correctAnswerId) {
+          if (isAnswered) {
+            if (answer.id === answerState.correctAnswerId) {
               answerClass += ' correct';
-            } else if (answer.id === selectedAnswer && !answerResult.isCorrect) {
+            } else if (answer.id === answerState.userAnswerId && !answerState.isCorrect) {
               answerClass += ' incorrect';
             }
           } else if (answer.id === selectedAnswer) {
@@ -175,12 +328,13 @@ export default function QuizQuestion({ sessionId, totalQuestions, onComplete }) 
           }
           
           return (
-            <button
-              key={answer.id}
-              className={answerClass}
-              onClick={() => !answerResult && setSelectedAnswer(answer.id)}
-              disabled={!!answerResult}
-            >
+                <button
+                  key={answer.id}
+                  className={answerClass}
+                  data-answer-id={answer.id}
+                  onClick={() => !isAnswered && !loading && setSelectedAnswer(answer.id)}
+                  disabled={isAnswered || loading}
+                >
               <span className="answer-label">{answer.label}</span>
               <span className="answer-content">{answer.content}</span>
             </button>
@@ -189,25 +343,32 @@ export default function QuizQuestion({ sessionId, totalQuestions, onComplete }) 
       </div>
 
       {/* Result and Explanation */}
-      {answerResult && (
-        <div className={`answer-feedback ${answerResult.isCorrect ? 'correct' : 'incorrect'}`}>
+      {answerState && (
+        <div className={`answer-feedback ${answerState.isCorrect ? 'correct' : 'incorrect'}`}>
           <div className="feedback-header">
             <span className="feedback-icon">
-              {answerResult.isCorrect ? '✓' : '✗'}
+              {answerState.isCorrect ? 'OK' : 'X'}
             </span>
             <span className="feedback-text">
-              {answerResult.isCorrect ? 'Правильно!' : 'Неправильно'}
+              {answerState.isCorrect ? 'Правильно!' : 'Неправильно'}
             </span>
           </div>
-          {answerResult.explanation && (
-            <p className="explanation">{answerResult.explanation}</p>
+          {answerState.explanation && (
+            <p className="explanation">{answerState.explanation}</p>
           )}
         </div>
       )}
 
       {/* Action Button */}
       <div className="action-buttons">
-        {!answerResult ? (
+        <button
+          className="nav-button"
+          onClick={handlePrev}
+          disabled={loading || submitting || questionIndex <= 0}
+        >
+          Назад
+        </button>
+        {!isAnswered ? (
           <button 
             className="submit-button"
             onClick={handleSubmit}
@@ -216,14 +377,32 @@ export default function QuizQuestion({ sessionId, totalQuestions, onComplete }) 
             {submitting ? 'Отправка...' : 'Ответить'}
           </button>
         ) : (
-          <button 
-            className="next-button"
-            onClick={handleNext}
-          >
-            {answerResult.hasNext ? 'Следующий вопрос →' : 'Результаты →'}
-          </button>
+          <span className="answer-locked">Ответ сохранен</span>
         )}
+        <button
+          className="nav-button"
+          onClick={handleNext}
+          disabled={loading || submitting || questionIndex >= totalCount - 1}
+        >
+          Вперед
+        </button>
       </div>
+      {allAnswered && (
+        <div className="results-actions">
+          <button className="show-results-button" onClick={onComplete}>
+            Показать ответы
+          </button>
+        </div>
+      )}
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
