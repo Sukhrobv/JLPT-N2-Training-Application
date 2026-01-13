@@ -14,11 +14,11 @@ export async function getTypes() {
   return response.json();
 }
 
-export async function createSession({ typeId, chapterIds, limit }) {
+export async function createSession(payload) {
   const response = await fetch(`${API_BASE}/sessions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ typeId, chapterIds, limit })
+    body: JSON.stringify(payload)
   });
   if (!response.ok) throw new Error('Failed to create session');
   return response.json();

@@ -11,6 +11,19 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+const MIXED_TEMPLATE_COUNTS = {
+  1: 5,
+  2: 5,
+  3: 5,
+  4: 7,
+  5: 5,
+  6: 5,
+  7: 12,
+  8: 5,
+  9: 5
+};
+const READING_TYPE_ID = 9;
+
 app.use(cors());
 app.use(express.json());
 
@@ -28,6 +41,61 @@ function shuffleArray(array) {
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
   return shuffled;
+}
+
+function getRandomItem(array) {
+  return array[Math.floor(Math.random() * array.length)];
+}
+
+function buildMixedTemplateQuestions() {
+  const selected = [];
+
+  // Types 1-8: берём случайные вопросы в указанном количестве
+  for (const [typeIdString, count] of Object.entries(MIXED_TEMPLATE_COUNTS)) {
+    const typeId = Number(typeIdString);
+    if (typeId === READING_TYPE_ID) continue;
+
+    const available = db.prepare(`
+      SELECT q.*, rp.id as reading_passage_id, rp.content as passage_content, rp.title as passage_title
+      FROM questions q
+      LEFT JOIN reading_passages rp ON q.passage_id = rp.id
+      WHERE q.type_id = ?
+    `).all(typeId);
+
+    if (available.length < count) {
+      throw new Error(`Недостаточно вопросов для типа ${typeId}: нужно ${count}, доступно ${available.length}`);
+    }
+
+    selected.push(...shuffleArray(available).slice(0, count));
+  }
+
+  // Type 9: берём один рандомный текст и все его вопросы
+  const passages = db.prepare(`
+    SELECT rp.id, rp.content, rp.title
+    FROM reading_passages rp
+    JOIN questions q ON q.passage_id = rp.id AND q.type_id = ?
+    GROUP BY rp.id
+  `).all(READING_TYPE_ID);
+
+  if (passages.length === 0) {
+    throw new Error('Нет текстов для мондая 9');
+  }
+
+  const selectedPassage = getRandomItem(passages);
+  const passageQuestions = db.prepare(`
+    SELECT q.*, rp.id as reading_passage_id, rp.content as passage_content, rp.title as passage_title
+    FROM questions q
+    JOIN reading_passages rp ON q.passage_id = rp.id
+    WHERE q.type_id = ? AND rp.id = ?
+    ORDER BY q.order_in_passage
+  `).all(READING_TYPE_ID, selectedPassage.id);
+
+  if (passageQuestions.length === 0) {
+    throw new Error('У выбранного текста нет вопросов');
+  }
+
+  selected.push(...passageQuestions);
+  return selected;
 }
 
 // ==================== API ENDPOINTS ====================
@@ -68,35 +136,47 @@ app.get('/api/types', (req, res) => {
 // POST /api/sessions - Create a new training session
 app.post('/api/sessions', (req, res) => {
   try {
-    const { typeId, chapterIds, limit } = req.body;
+    const { typeId, chapterIds, limit, preset } = req.body;
+    const useMixedTemplate = preset === 'mixed_chapter';
+    const effectiveLimit = useMixedTemplate ? null : limit;
     
-    // Build query conditions
-    let conditions = [];
-    let params = [];
+    let questions = [];
     
-    if (typeId) {
-      conditions.push('q.type_id = ?');
-      params.push(typeId);
-    }
-    
-    if (chapterIds && chapterIds.length > 0) {
-      conditions.push(`q.chapter_id IN (${chapterIds.map(() => '?').join(',')})`);
-      params.push(...chapterIds);
-    }
-    
-    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
-    
-    // Fetch questions with passage info
-    const questions = db.prepare(`
-      SELECT q.*, rp.id as reading_passage_id, rp.content as passage_content, rp.title as passage_title
-      FROM questions q
-      LEFT JOIN reading_passages rp ON q.passage_id = rp.id
-      ${whereClause}
-      ORDER BY q.passage_id, q.order_in_passage
-    `).all(...params);
-    
-    if (questions.length === 0) {
-      return res.status(400).json({ error: 'No questions found with selected filters' });
+    if (useMixedTemplate) {
+      try {
+        questions = buildMixedTemplateQuestions();
+      } catch (templateError) {
+        return res.status(400).json({ error: templateError.message });
+      }
+    } else {
+      // Build query conditions
+      let conditions = [];
+      let params = [];
+      
+      if (typeId) {
+        conditions.push('q.type_id = ?');
+        params.push(typeId);
+      }
+      
+      if (chapterIds && chapterIds.length > 0) {
+        conditions.push(`q.chapter_id IN (${chapterIds.map(() => '?').join(',')})`);
+        params.push(...chapterIds);
+      }
+      
+      const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+      
+      // Fetch questions with passage info
+      questions = db.prepare(`
+        SELECT q.*, rp.id as reading_passage_id, rp.content as passage_content, rp.title as passage_title
+        FROM questions q
+        LEFT JOIN reading_passages rp ON q.passage_id = rp.id
+        ${whereClause}
+        ORDER BY q.passage_id, q.order_in_passage
+      `).all(...params);
+      
+      if (questions.length === 0) {
+        return res.status(400).json({ error: 'No questions found with selected filters' });
+      }
     }
     
     // Group questions by passage for reading comprehension
@@ -143,8 +223,8 @@ app.post('/api/sessions', (req, res) => {
     });
     
     // Apply limit if specified
-    if (limit && limit > 0 && limit < finalQuestions.length) {
-      finalQuestions = finalQuestions.slice(0, limit);
+    if (effectiveLimit && effectiveLimit > 0 && effectiveLimit < finalQuestions.length) {
+      finalQuestions = finalQuestions.slice(0, effectiveLimit);
     }
     
     // Create session
@@ -156,8 +236,8 @@ app.post('/api/sessions', (req, res) => {
     
     insertSession.run(
       sessionId,
-      typeId ? String(typeId) : null,
-      chapterIds ? JSON.stringify(chapterIds) : null,
+      useMixedTemplate ? 'mixed_chapter' : typeId ? String(typeId) : null,
+      useMixedTemplate ? 'mixed_all' : chapterIds ? JSON.stringify(chapterIds) : null,
       finalQuestions.length
     );
     
