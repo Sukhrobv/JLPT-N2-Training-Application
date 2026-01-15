@@ -111,6 +111,7 @@ function App() {
             sessionId={sessionId}
             totalQuestions={totalQuestions}
             onComplete={handleQuizComplete}
+            onExit={handleBackToMenu}
           />
         )}
         

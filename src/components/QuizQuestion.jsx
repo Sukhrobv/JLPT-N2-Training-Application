@@ -2,7 +2,7 @@
 import * as api from '../services/api';
 import './QuizQuestion.css';
 
-export default function QuizQuestion({ sessionId, totalQuestions, onComplete }) {
+export default function QuizQuestion({ sessionId, totalQuestions, onComplete, onExit }) {
   const [questionData, setQuestionData] = useState(null);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -309,6 +309,9 @@ export default function QuizQuestion({ sessionId, totalQuestions, onComplete }) 
         <div className="quiz-timer" aria-live="polite">
           {formatElapsed(elapsedSeconds)}
         </div>
+        <button className="exit-quiz-button" onClick={onExit} title="Выйти в меню">
+          ✕
+        </button>
       </div>
 
       {/* Reading Passage */}
