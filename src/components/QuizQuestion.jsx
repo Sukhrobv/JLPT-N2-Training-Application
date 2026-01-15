@@ -41,11 +41,15 @@ export default function QuizQuestion({ sessionId, totalQuestions, onComplete, on
 
   useEffect(() => {
     const handleKeyDown = (event) => {
-      const isSpace = event.code === 'Space' || event.key === ' ';
-      const isArrowDown = event.key === 'ArrowDown';
-      const isArrowUp = event.key === 'ArrowUp';
-      if (!isSpace && !isArrowDown && !isArrowUp) return;
-      if (isSpace && event.repeat) return;
+      const key = event.key;
+      const lowerKey = typeof key === 'string' ? key.toLowerCase() : '';
+      const isSpace = event.code === 'Space' || key === ' ';
+      const isArrowDown = key === 'ArrowDown';
+      const isArrowUp = key === 'ArrowUp';
+      const answerKeyMap = { a: 0, b: 1, c: 2, d: 3 };
+      const isAnswerKey = Object.prototype.hasOwnProperty.call(answerKeyMap, lowerKey);
+      if (!isSpace && !isArrowDown && !isArrowUp && !isAnswerKey) return;
+      if ((isSpace || isAnswerKey) && event.repeat) return;
       const target = event.target;
       if (target?.isContentEditable) return;
       const tagName = target?.tagName?.toUpperCase();
@@ -59,6 +63,20 @@ export default function QuizQuestion({ sessionId, totalQuestions, onComplete, on
         return;
       }
       if (loading || submitting || !questionData) return;
+
+      if (isAnswerKey) {
+        if (isAnswered) return;
+        const answers = questionData.question?.answers || [];
+        if (!answers.length) return;
+        const labeledAnswer = answers.find(
+          (answer) => answer.label?.toLowerCase() === lowerKey
+        );
+        const targetAnswer = labeledAnswer ?? answers[answerKeyMap[lowerKey]];
+        if (!targetAnswer) return;
+        event.preventDefault();
+        setSelectedAnswer(targetAnswer.id);
+        return;
+      }
 
       if (isSpace) {
         const answerButton = target?.closest('[data-answer-id]');
