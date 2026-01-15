@@ -62,6 +62,12 @@ function App() {
     }
   };
 
+  const handleBackToMenu = () => {
+    setScreen('setup');
+    setSessionId(null);
+    setTotalQuestions(0);
+  };
+
   const handleToggleTheme = (event) => {
     setTheme(event.target.checked ? 'dark' : 'light');
   };
@@ -112,6 +118,7 @@ function App() {
           <Results 
             sessionId={sessionId}
             onRestart={handleRestart}
+            onBackToMenu={handleBackToMenu}
           />
         )}
 

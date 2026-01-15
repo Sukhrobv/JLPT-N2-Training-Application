@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import * as api from '../services/api';
 import './Results.css';
 
-export default function Results({ sessionId, onRestart }) {
+export default function Results({ sessionId, onRestart, onBackToMenu }) {
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -172,7 +172,7 @@ export default function Results({ sessionId, onRestart }) {
         <button className="primary-button" onClick={onRestart}>
           Попробовать ещё раз
         </button>
-        <button className="secondary-button" onClick={() => window.location.reload()}>
+        <button className="secondary-button" onClick={onBackToMenu}>
           На главную
         </button>
       </div>
