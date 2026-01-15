@@ -82,6 +82,33 @@
   font-variant-numeric: tabular-nums;
 }
 
+.exit-quiz-button {
+  padding: 0.5rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 1.25rem;
+  line-height: 1;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.exit-quiz-button:hover {
+  background: var(--card-hover);
+  border-color: var(--error);
+  color: var(--error);
+}
+
+.exit-quiz-button:active {
+  transform: scale(0.95);
+}
+
 /* Reading Passage */
 .reading-passage {
   background: var(--card-bg);
