@@ -146,7 +146,8 @@ export default function QuizSetup({ onStart }) {
     <div className="quiz-setup">
       <div className="setup-header">
         <h1>Тренажёр JLPT N2</h1>
-        <p className="subtitle">Запустите готовый пресет или выберите главы и лимит вручную.</p>
+        <p className="subtitle" style={{ color: 'red' }}>НЕ ЗАБЫВАЙТЕ ДЕЛАТЬ GIT PULL!!  <br />
+        МОГУТ БЫТЬ НЕКОТОРЫЕ ОШИБКИ В ТЕСТАХ И ОНИ РЕШАЮТСЯ ОБНОВЛЕНИЯМИ.</p>
       </div>
 
       <div className="setup-section">
