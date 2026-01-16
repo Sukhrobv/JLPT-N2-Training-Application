@@ -87,7 +87,7 @@
     "chapter": "第5回 模擬テスト",
     "id": 7,
     "type": 2,
-    "content": "今朝は手がかじかんで、物がうまくつかめないほど寒かった。",
+    "content": "今朝は手が__こごえて__、物がうまくつかめないほど寒かった。",
     "answers": [
       "冷えて",
       "寒えて",
@@ -95,7 +95,7 @@
       "涼えて"
     ],
     "correctAnswer": 3,
-    "explanation": "Note: The question text here seems to match question 7 in the image which asks for the reading/kanji of 'かじかんで' (implied by context of cold hands/numbness) but the provided image options are for kanji choice. Wait, looking at image 50b4f3, Q7 is '手がかごえて' (kogoe te)? No, text is '手がかじかんで' but options are kanji for 'kogoete'. Wait, text in image is '手がかごえて' (implied reading of kanji 凍えて is kogoete, meaning numb/frozen). The question asks for Kanji for 'kogoete'. Let's re-read carefully: '今朝は手がこごえて'. Yes. Answer 3 is 凍えて."
+    "explanation": " "
   },
   {
     "chapter": "第5回 模擬テスト",
