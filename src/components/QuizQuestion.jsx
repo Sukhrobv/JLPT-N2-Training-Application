@@ -2,7 +2,7 @@
 import * as api from '../services/api';
 import './QuizQuestion.css';
 
-export default function QuizQuestion({ sessionId, totalQuestions, onComplete, onExit }) {
+export default function QuizQuestion({ sessionId, totalQuestions, onComplete, onExit, onRestart }) {
   const [questionData, setQuestionData] = useState(null);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -321,15 +321,22 @@ export default function QuizQuestion({ sessionId, totalQuestions, onComplete, on
 
       {/* Question Type Badge + Timer */}
       <div className="question-topbar">
-        <div className="question-type-badge">
-          {typeName}
+        <div className="topbar-left">
+          <div className="question-type-badge">
+            {typeName}
+          </div>
+          <div className="quiz-timer" aria-live="polite">
+            {formatElapsed(elapsedSeconds)}
+          </div>
         </div>
-        <div className="quiz-timer" aria-live="polite">
-          {formatElapsed(elapsedSeconds)}
+        <div className="topbar-actions">
+          <button className="exit-quiz-button refresh-button" onClick={onRestart} title="Заново">
+            ↻
+          </button>
+          <button className="exit-quiz-button" onClick={onExit} title="Выйти в меню">
+            ✕
+          </button>
         </div>
-        <button className="exit-quiz-button" onClick={onExit} title="Выйти в меню">
-          ✕
-        </button>
       </div>
 
       {/* Reading Passage */}

@@ -112,6 +112,7 @@ function App() {
             totalQuestions={totalQuestions}
             onComplete={handleQuizComplete}
             onExit={handleBackToMenu}
+            onRestart={handleRestart}
           />
         )}
         

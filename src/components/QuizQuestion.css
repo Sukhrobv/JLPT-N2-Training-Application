@@ -72,6 +72,12 @@
   margin-bottom: 1.5rem;
 }
 
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .quiz-timer {
   padding: 0.45rem 0.9rem;
   border-radius: 999px;
@@ -107,6 +113,17 @@
 
 .exit-quiz-button:active {
   transform: scale(0.95);
+}
+
+.topbar-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.refresh-button:hover {
+  border-color: #f59e0b;
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
 }
 
 /* Reading Passage */
