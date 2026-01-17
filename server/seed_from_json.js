@@ -18,7 +18,23 @@ db.transaction(() => {
   db.prepare('DELETE FROM questions').run();
   db.prepare('DELETE FROM reading_passages').run();
   db.prepare('DELETE FROM chapters').run();
-  // Reset sequence counters if needed, but SQLite handles ids automatically usually
+  db.prepare('DELETE FROM question_types').run();
+
+  // Insert 9 fixed question types (問題1-9)
+  const insertType = db.prepare('INSERT INTO question_types (id, name, name_ja, description) VALUES (?, ?, ?, ?)');
+  const types = [
+    [1, 'mondai1', '問題1 - 漢字読み', 'Чтение кандзи: выбрать правильное чтение подчёркнутого слова'],
+    [2, 'mondai2', '問題2 - 漢字書き', 'Написание кандзи: выбрать кандзи для хираганы'],
+    [3, 'mondai3', '問題3 - 語形成', 'Образование слов: выбрать подходящее слово в контексте'],
+    [4, 'mondai4', '問題4 - 文脈規定', 'Контекст: выбрать слово для заполнения пропуска'],
+    [5, 'mondai5', '問題5 - 言い換え', 'Синонимы: выбрать близкое по значению слово'],
+    [6, 'mondai6', '問題6 - 用法', 'Употребление: выбрать правильное использование слова'],
+    [7, 'mondai7', '問題7 - 文法', 'Грамматика: выбрать правильную грамматическую конструкцию'],
+    [8, 'mondai8', '問題8 - 文の組み立て', 'Порядок: расставить части предложения (★)'],
+    [9, 'mondai9', '問題9 - 読解', 'Чтение: прочитать текст и ответить на вопросы'],
+  ];
+  types.forEach(([id, name, nameJa, desc]) => insertType.run(id, name, nameJa, desc));
+  console.log(`Initialized ${types.length} question types.`);
 })();
 console.log('Database cleared.');
 
