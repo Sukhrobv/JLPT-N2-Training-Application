@@ -790,7 +790,7 @@ app.delete('/api/admin/questions/:id', (req, res) => {
 
 // Catch-all route for SPA in production
 if (process.env.NODE_ENV === 'production') {
-  app.get('(.*)', (req, res) => {
+  app.get(/.*/, (req, res) => {
     res.sendFile(path.join(__dirname, '../dist/index.html'));
   });
 }
