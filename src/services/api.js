@@ -25,7 +25,7 @@ export async function createSession(payload) {
 }
 
 export async function getSessionQuestion(sessionId, index = null) {
-  const url = new URL(`${API_BASE}/sessions/${sessionId}`);
+  const url = new URL(`${API_BASE}/sessions/${sessionId}`, window.location.origin);
   if (Number.isInteger(index)) {
     url.searchParams.set('index', index);
   }
