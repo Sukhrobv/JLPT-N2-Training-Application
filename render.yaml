@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: hidden-halley
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build && npm run refresh
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production

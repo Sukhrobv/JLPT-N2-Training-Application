@@ -1,111 +1,54 @@
-# Деплой приложения (бесплатно)
+# Инструкция по деплою на Render.com
 
-## Рекомендуемый вариант: Render.com
+Мы выбрали Render.com, так как это самый простой и бесплатный способ запустить ваше приложение.
 
-Render предлагает бесплатный хостинг для статических сайтов и Node.js приложений.
+## Вариант 1: Автоматический (Рекомендуемый)
 
-### Шаг 1: Подготовка
+Я создал файл `render.yaml` в корне вашего проекта. Это "чертеж", который Render понимает.
 
-Добавьте в `package.json` скрипт для продакшена:
-
-```json
-{
-  "scripts": {
-    "start": "node server/server.js",
-    "build": "vite build"
-  }
-}
-```
-
-### Шаг 2: Загрузка на GitHub
-
-```bash
-git init
-git add .
-git commit -m "Initial commit"
-git remote add origin https://github.com/YOUR_USERNAME/jlpt-trainer.git
-git push -u origin main
-```
-
-### Шаг 3: Создание сервиса на Render
-
-1. Зарегистрируйтесь на [render.com](https://render.com)
-2. Нажмите **New → Web Service**
-3. Подключите GitHub репозиторий
-4. Настройте:
-   - **Name**: `jlpt-trainer`
-   - **Runtime**: `Node`
-   - **Build Command**: `npm install && npm run build`
-   - **Start Command**: `npm start`
-5. Нажмите **Create Web Service**
-
-### Шаг 4: Настройка статики
-
-Обновите `server/server.js` для раздачи фронтенда:
-
-```javascript
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// После app.use(express.json()):
-app.use(express.static(path.join(__dirname, "../dist")));
-
-// В конце файла, перед app.listen():
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../dist/index.html"));
-});
-```
+1. Загрузите изменения на GitHub:
+   ```bash
+   git add .
+   git commit -m "Add render config"
+   git push
+   ```
+2. Зайдите на [dashboard.render.com/blueprints](https://dashboard.render.com/blueprints).
+3. Нажмите **New Blueprint Instance**.
+4. Подключите ваш репозиторий.
+5. Render всё сделает сам!
 
 ---
 
-## Альтернатива: Railway.app
+## Вариант 2: Ручная настройка (То, что вы делаете сейчас)
 
-1. Зарегистрируйтесь на [railway.app](https://railway.app)
-2. Нажмите **New Project → Deploy from GitHub**
-3. Выберите репозиторий
-4. Railway автоматически определит Node.js проект
+Если вы настраиваете сервис вручную через кнопку "New Web Service", вот правильные настройки:
 
----
+### 1. Build & Start Commands
 
-## Альтернатива: Vercel + Serverless
+- **Build Command**: `npm install && npm run build && npm run refresh`
+  _(Это важно! Мы добавляем `npm run refresh`, чтобы при каждом деплое база данных наполнялась вопросами заново. Иначе она будет пустой.)_
+- **Start Command**: `npm start`
 
-Для Vercel нужно переписать бэкенд как Serverless Functions, что сложнее.
+### 2. Environment Variables (Переменные окружения)
 
----
+Вот ответ на ваш вопрос про скриншот:
 
-## Важные замечания
+| Key (Ключ) | Value (Значение) |
+| :--------- | :--------------- |
+| `NODE_ENV` | `production`     |
 
-### База данных в продакшене
-
-⚠️ SQLite хранит данные в файле. При редеплое на Render/Railway **файл может быть перезаписан**!
-
-**Решение 1**: Храните `jlpt.db` в постоянном хранилище (Render Persistent Disk — платно).
-
-**Решение 2**: Используйте внешнюю БД:
-
-- [Turso](https://turso.tech) — SQLite в облаке (бесплатно)
-- [PlanetScale](https://planetscale.com) — MySQL (бесплатно)
-- [Neon](https://neon.tech) — PostgreSQL (бесплатно)
-
-### Переменные окружения
-
-На Render/Railway добавьте:
-
-- `PORT` — обычно выставляется автоматически
-- `NODE_ENV=production`
+_Нажмите "Add Environment Variable", введите `NODE_ENV` слева и `production` справа._
 
 ---
 
-## Быстрый деплой: Glitch.com
+## Важно знать
 
-Самый простой вариант для тестирования:
+**Почему база данных сбрасывается?**
+На бесплатном тарифе Render (и почти всех аналогов) диск "временный". Когда сервер перезагружается (или вы делаете новый деплой), все файлы, созданные во время работы (включая `jlpt.db`), удаляются.
 
-1. Откройте [glitch.com](https://glitch.com)
-2. **New Project → Import from GitHub**
-3. Вставьте URL репозитория
-4. Приложение автоматически запустится
+**Наше решение:**
+Именно поэтому в команду сборки мы добавили `npm run refresh`.
 
-**Минусы**: проект "засыпает" после неактивности, база данных может быть сброшена.
+- Каждый раз, когда Render запускает ваш сайт, он берет JSON-файлы (`chapter1.json` и т.д.) и заново создает базу данных.
+- **Плюс**: Сайт всегда работает и вопросы на месте.
+- **Минус**: Если пользователь начал тест и сервер перезагрузился — его прогресс в конкретном тесте пропадет. Для портфолио это не страшно.
