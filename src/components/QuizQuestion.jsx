@@ -46,7 +46,7 @@ export default function QuizQuestion({ sessionId, totalQuestions, onComplete, on
       const isSpace = event.code === 'Space' || key === ' ';
       const isArrowDown = key === 'ArrowDown';
       const isArrowUp = key === 'ArrowUp';
-      const answerKeyMap = { a: 0, b: 1, c: 2, d: 3 };
+      const answerKeyMap = { '1': 0, '2': 1, '3': 2, '4': 3 };
       const isAnswerKey = Object.prototype.hasOwnProperty.call(answerKeyMap, lowerKey);
       if (!isSpace && !isArrowDown && !isArrowUp && !isAnswerKey) return;
       if ((isSpace || isAnswerKey) && event.repeat) return;
