@@ -260,9 +260,12 @@
 
 /* Answer Feedback */
 .answer-feedback {
-  padding: 1.5rem;
-  border-radius: 16px;
-  margin-bottom: 2rem;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-top: 1.5rem;
+  margin-bottom: 0;
+  background: var(--card-hover);
+  border: 1px solid var(--border);
   animation: fadeIn 0.3s ease;
 }
 
@@ -271,81 +274,36 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-.answer-feedback.correct {
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-}
-
-.answer-feedback.incorrect {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-}
-
-.feedback-header {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
-}
-
-.feedback-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-  font-weight: bold;
-}
-
-.answer-feedback.correct .feedback-icon {
-  background: var(--success);
-  color: white;
-}
-
-.answer-feedback.incorrect .feedback-icon {
-  background: var(--error);
-  color: white;
-}
-
-.feedback-text {
-  font-size: 1.25rem;
-  font-weight: 700;
-}
-
-.answer-feedback.correct .feedback-text {
-  color: var(--success);
-}
-
-.answer-feedback.incorrect .feedback-text {
-  color: var(--error);
-}
-
 .explanation {
-  color: var(--text-secondary);
+  color: var(--text-primary);
   line-height: 1.6;
   margin: 0;
+  font-size: 0.95rem;
 }
 
 /* Action Buttons */
 .action-buttons {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
+  justify-content: center; /* Center the group */
   gap: 1rem;
+  width: 100%;
 }
 
 .submit-button,
 .next-button {
-  padding: 1rem 2.5rem;
+  flex: 1; /* Take up remaining space */
+  max-width: 200px; /* Limit width further */
+  padding: 1rem;
   font-size: 1.125rem;
   font-weight: 600;
   border: none;
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .submit-button {
@@ -364,15 +322,46 @@
   cursor: not-allowed;
 }
 
-.next-button {
-  background: var(--success);
-  color: white;
-  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+.nav-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  padding: 0;
+  border-radius: 12px;
+  border: 2px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0; /* Don't shrink */
 }
 
-.next-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 30px rgba(16, 185, 129, 0.4);
+.nav-button:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--card-hover);
+}
+
+.nav-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.answer-locked {
+  flex: 1;
+  max-width: 200px; /* Limit width further */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 12px;
+  background: var(--card-bg);
+  border: 2px dashed var(--border);
+  color: var(--text-secondary);
+  text-align: center;
 }
 
 /* Ordering Slot (Mondai 8) */
@@ -495,26 +484,7 @@
   flex-wrap: wrap;
 }
 
-.nav-button {
-  padding: 0.85rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  border-radius: 12px;
-  border: 2px solid var(--border);
-  background: var(--card-bg);
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
 
-.nav-button:hover:not(:disabled) {
-  border-color: var(--accent);
-}
-
-.nav-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
 
 .show-results-button {
   padding: 0.9rem 1.75rem;
@@ -552,3 +522,86 @@
   justify-content: center;
   margin-top: 1.25rem;
 }
+
+/* Copy Buttons */
+.copy-button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.question-text-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.copy-icon-button {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  opacity: 0.3;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.copy-icon-button:hover {
+  opacity: 1;
+  background: var(--card-hover);
+  color: var(--accent);
+}
+
+.answer-wrapper {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+
+.answer-option {
+  flex: 1;
+  /* Ensure padding on right to not overlap with copy button if we were using absolute, 
+     but here we are using siblings so it's fine. 
+     However, to keep the "organic" feel, let's make the copy button absolute 
+     so it floats over the answer button area or sits neatly to the side.
+     Actually, let's make it absolute inside the wrapper to keep the layout identical.
+  */
+  width: 100%;
+}
+
+.copy-answer-button {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  opacity: 0;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.answer-wrapper:hover .copy-answer-button {
+  opacity: 0.5;
+}
+
+.copy-answer-button:hover {
+  opacity: 1 !important;
+  background: var(--card-bg); /* Add background to stand out against answer button */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  color: var(--accent);
+}
+

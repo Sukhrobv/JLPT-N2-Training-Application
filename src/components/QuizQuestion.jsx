@@ -267,6 +267,49 @@ export default function QuizQuestion({ sessionId, totalQuestions, onComplete, on
     return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
   };
 
+  const CopyIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+    </svg>
+  );
+
+  const handleCopy = (text, event) => {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault(); // Prevent default button behavior
+    }
+    navigator.clipboard.writeText(text).then(() => {
+      // Optional: Show a toast or tooltip
+    }).catch(err => {
+      console.error('Failed to copy:', err);
+    });
+  };
+
+  const handleCopyAll = () => {
+    if (!questionData) return;
+    
+    const parts = [];
+    
+    // Add passage if exists
+    if (questionData.passage) {
+      parts.push(questionData.passage.content);
+      parts.push('');
+    }
+    
+    // Add question
+    parts.push(questionData.question.content.replace(/____/g, '____'));
+    parts.push('');
+    
+    // Add answers
+    questionData.question.answers.forEach((a, i) => {
+      const label = a.label || String(i + 1);
+      parts.push(`${label}. ${a.content}`);
+    });
+    
+    handleCopy(parts.join('\n'));
+  };
+
   return (
     <div className="quiz-question">
       {/* Progress Bar */}
@@ -330,6 +373,13 @@ export default function QuizQuestion({ sessionId, totalQuestions, onComplete, on
           </div>
         </div>
         <div className="topbar-actions">
+          <button 
+            className="exit-quiz-button copy-button" 
+            onClick={handleCopyAll} 
+            title="Копировать всё"
+          >
+            <CopyIcon />
+          </button>
           <button className="exit-quiz-button refresh-button" onClick={onRestart} title="Заново">
             ↻
           </button>
@@ -356,9 +406,18 @@ export default function QuizQuestion({ sessionId, totalQuestions, onComplete, on
 
       {/* Question */}
       <div className="question-content">
-        <p>
-          {renderQuestionContent(questionData.question.content)}
-        </p>
+        <div className="question-text-wrapper">
+          <p>
+            {renderQuestionContent(questionData.question.content)}
+          </p>
+          <button 
+            className="copy-icon-button" 
+            onClick={(e) => handleCopy(questionData.question.content, e)}
+            title="Копировать вопрос"
+          >
+            <CopyIcon />
+          </button>
+        </div>
       </div>
 
       {/* Answer Options */}
@@ -377,36 +436,27 @@ export default function QuizQuestion({ sessionId, totalQuestions, onComplete, on
           }
           
           return (
-                <button
-                  key={answer.id}
-                  className={answerClass}
-                  data-answer-id={answer.id}
-                  onClick={() => !isAnswered && !loading && setSelectedAnswer(answer.id)}
-                  disabled={isAnswered || loading}
-                >
-              <span className="answer-label">{answer.label}</span>
-              <span className="answer-content">{answer.content}</span>
-            </button>
+            <div key={answer.id} className="answer-wrapper">
+              <button
+                className={answerClass}
+                data-answer-id={answer.id}
+                onClick={() => !isAnswered && !loading && setSelectedAnswer(answer.id)}
+                disabled={isAnswered || loading}
+              >
+                <span className="answer-label">{answer.label}</span>
+                <span className="answer-content">{answer.content}</span>
+              </button>
+              <button 
+                className="copy-answer-button"
+                onClick={(e) => handleCopy(answer.content, e)}
+                title="Копировать ответ"
+              >
+                <CopyIcon />
+              </button>
+            </div>
           );
         })}
       </div>
-
-      {/* Result and Explanation */}
-      {answerState && (
-        <div className={`answer-feedback ${answerState.isCorrect ? 'correct' : 'incorrect'}`}>
-          <div className="feedback-header">
-            <span className="feedback-icon">
-              {answerState.isCorrect ? 'OK' : 'X'}
-            </span>
-            <span className="feedback-text">
-              {answerState.isCorrect ? 'Правильно!' : 'Неправильно'}
-            </span>
-          </div>
-          {answerState.explanation && (
-            <p className="explanation">{answerState.explanation}</p>
-          )}
-        </div>
-      )}
 
       {/* Action Button */}
       <div className="action-buttons">
@@ -414,8 +464,11 @@ export default function QuizQuestion({ sessionId, totalQuestions, onComplete, on
           className="nav-button"
           onClick={handlePrev}
           disabled={loading || submitting || questionIndex <= 0}
+          aria-label="Назад"
         >
-          Назад
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+          </svg>
         </button>
         {!isAnswered ? (
           <button 
@@ -432,10 +485,21 @@ export default function QuizQuestion({ sessionId, totalQuestions, onComplete, on
           className="nav-button"
           onClick={handleNext}
           disabled={loading || submitting || questionIndex >= totalCount - 1}
+          aria-label="Вперед"
         >
-          Вперед
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+          </svg>
         </button>
       </div>
+
+      {/* Explanation (Only if exists) */}
+      {answerState && answerState.explanation && (
+        <div className="answer-feedback">
+          <p className="explanation">{answerState.explanation}</p>
+        </div>
+      )}
+
       {allAnswered && (
         <div className="results-actions">
           <button className="show-results-button" onClick={onComplete}>
